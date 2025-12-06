@@ -183,6 +183,7 @@ export default function Navbar() {
                                 <Link
                                   href={`/products/${cat.slug}/${sub.slug}`}
                                   className="text-sm hover:text-blue-600 transition"
+                                  aria-label={`رفتن به ${cat.slug}`}
                                 >
                                   {sub.name}
                                 </Link>
@@ -218,7 +219,7 @@ export default function Navbar() {
           /> */}
 
           {/* سبد خرید */}
-          <Link href="/cart">
+          <Link aria-label={"سبد خرید"} href="/cart">
             <div
               className="flex items-center gap-1 relative cursor-pointer"
               onMouseEnter={() => setActiveDropdown("cart")}

@@ -1,7 +1,20 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+const nextConfig = {
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
+  compiler: {
+    removeConsole: true,
+  },
+  // این مهم‌ترین بخش:
+  browserslist: {
+    production: [
+      ">0.3%",
+      "not dead",
+      "not op_mini all",
+      "not IE 11",
+    ],
+    development: ["last 1 chrome version", "last 1 firefox version"],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

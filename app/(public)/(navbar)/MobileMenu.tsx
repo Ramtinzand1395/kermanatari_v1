@@ -11,18 +11,15 @@ interface Category {
   slug: string;
   subcategories: { name: string; slug: string }[];
 }
-
 interface MenuItem {
   name: string;
   link: string;
   icon: React.ReactNode;
 }
-
 interface UserWithRole {
   name?: string | null;
   role?: string;
 }
-
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -112,6 +109,7 @@ export default function MobileMenu({
                                   {cat.subcategories.map((sub) => (
                                     <li key={sub.slug}>
                                       <Link
+                                        aria-label={`رفتن به ${cat.slug}`}
                                         href={`/products/${cat.slug}/${sub.slug}`}
                                         onClick={onClose}
                                         className="block text-gray-600 text-sm hover:text-blue-600 transition"
@@ -131,6 +129,7 @@ export default function MobileMenu({
                     <Link
                       href={item.link}
                       onClick={onClose}
+                      aria-label="بستن"
                       className="flex items-center gap-2 text-gray-800 text-base font-medium hover:text-blue-600 transition"
                     >
                       {item.icon}
@@ -167,6 +166,7 @@ export default function MobileMenu({
                         <div>
                           <Link
                             href="/my-profile?step=1"
+                            aria-label="پروفایل من"
                             onClick={onClose}
                             className="block text-gray-600 text-sm hover:text-blue-600 transition"
                           >
@@ -176,6 +176,7 @@ export default function MobileMenu({
                         <div>
                           <Link
                             href="/my-profile?step=5"
+                            aria-label="سفارش‌ها"
                             onClick={onClose}
                             className="block text-gray-600 text-sm hover:text-blue-600 transition"
                           >
@@ -184,6 +185,7 @@ export default function MobileMenu({
                         </div>
                         <div>
                           <Link
+                            aria-label=" لیست علاقه‌مندی‌ ها"
                             href="/my-profile?step=2"
                             onClick={onClose}
                             className="block text-gray-600 text-sm hover:text-blue-600 transition"
