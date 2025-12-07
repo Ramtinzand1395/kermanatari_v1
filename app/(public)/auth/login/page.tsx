@@ -1,3 +1,186 @@
+"use client";
+import { useState, useEffect } from "react";
+import { CheckPhoneAction } from "@/helpers/CheckPhoneAction";
+import { sendOtpToUser } from "@/helpers/sendSms";
+import { signIn } from "next-auth/react";
+import { toast } from "react-toastify";
+
+export default function LoginWithOtp() {
+  const [mobile, setMobile] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [enteredOtp, setEnteredOtp] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [otpId, setOtpId] = useState<string | null>(null);
+
+  // ----------------------
+  // تایمر + ذخیره LocalStorage
+  // ----------------------
+  const totalTime = 120; // ۲ دقیقه
+  const [timer, setTimer] = useState(0);
+
+  useEffect(() => {
+    const savedExpireTime = localStorage.getItem("otpExpireTime");
+
+    if (savedExpireTime) {
+      const expire = Number(savedExpireTime);
+      const now = Date.now();
+      const diff = Math.floor((expire - now) / 1000);
+
+      if (diff > 0) {
+        setTimer(diff);
+        setOtpSent(true);
+      } else {
+        localStorage.removeItem("otpExpireTime");
+      }
+    }
+  }, []);
+
+  // اجرای تایمر
+  useEffect(() => {
+    if (timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 10;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
+
+  // ----------------------
+  // تابع اصلی ارسال OTP (فرم + resend)
+  // ----------------------
+  const sendOtp = async () => {
+    if (timer > 0) return; // جلوگیری از ارسال دوباره
+
+    setIsSubmitting(true);
+
+    try {
+      await CheckPhoneAction(mobile);
+      const otpRes = await sendOtpToUser(mobile);
+
+      setOtpId(otpRes);
+      setOtpSent(true);
+
+      toast.success("کد تایید ارسال شد");
+
+      // ۲ دقیقه بعدی
+      const expireTime = Date.now() + totalTime * 1000;
+      localStorage.setItem("otpExpireTime", expireTime.toString());
+
+      setTimer(totalTime);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSendOtp = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendOtp();
+  };
+
+  // ----------------------
+  // تایید OTP
+  // ----------------------
+  const handleVerifyOtp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!otpId) return;
+
+    try {
+      const res = await fetch("/api/verifyOtp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otpId, enteredOtp }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        toast.error(data.message || "کد اشتباه است");
+        return;
+      }
+
+      toast.success("ورود با موفقیت انجام شد");
+
+      localStorage.removeItem("otpExpireTime");
+
+      signIn("credentials", {
+        mobile,
+        callbackUrl: "/",
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <div className="max-w-sm mx-auto p-4">
+      {!otpSent ? (
+        <form onSubmit={handleSendOtp}>
+          <input
+            type="tel"
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
+            placeholder="شماره تماس را وارد کنید"
+            className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+
+          <button
+            type="submit"
+            disabled={isSubmitting || timer > 0}
+            className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50"
+          >
+            {isSubmitting ? "در حال ارسال..." : "ارسال کد تایید"}
+          </button>
+
+          {timer > 0 && (
+            <p className="text-center mt-3 text-gray-600">
+              ارسال مجدد پس از: <strong>{formatTime(timer)}</strong>
+            </p>
+          )}
+        </form>
+      ) : (
+        <form onSubmit={handleVerifyOtp}>
+          <input
+            type="text"
+            value={enteredOtp}
+            onChange={(e) => setEnteredOtp(e.target.value)}
+            placeholder="کد تایید را وارد کنید"
+            className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-green-500 outline-none"
+          />
+
+          <button className="w-full bg-green-500 text-white py-2 rounded">
+            تایید کد
+          </button>
+
+          {/* دکمه ارسال مجدد */}
+          {timer > 0 ? (
+            <p className="text-center mt-3 text-gray-600">
+              امکان ارسال مجدد تا: <strong>{formatTime(timer)}</strong>
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={sendOtp}
+              className="w-full bg-gray-200 text-black py-2 rounded mt-3"
+            >
+              ارسال مجدد کد
+            </button>
+          )}
+        </form>
+      )}
+    </div>
+  );
+}
+
+// !قبل از تایمر
 // "use client";
 // import { useState } from "react";
 // import { CheckPhoneAction } from "@/helpers/CheckPhoneAction";
@@ -95,159 +278,3 @@
 //     </div>
 //   );
 // }
-
-"use client";
-import { useState, useEffect } from "react";
-import { CheckPhoneAction } from "@/helpers/CheckPhoneAction";
-import { sendOtpToUser } from "@/helpers/sendSms";
-import { signIn } from "next-auth/react";
-import { toast } from "react-toastify";
-
-export default function LoginWithOtp() {
-  const [mobile, setMobile] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [enteredOtp, setEnteredOtp] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [otpId, setOtpId] = useState<string | null>(null);
-
-  // ----------------------
-  // تایمر ۲ دقیقه‌ای
-  // ----------------------
-  const [timer, setTimer] = useState(0); // بر حسب ثانیه
-  const totalTime = 120; // ۲ دقیقه
-
-  useEffect(() => {
-    if (timer <= 0) return;
-
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timer]);
-
-  const formatTime = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s < 10 ? "0" : ""}${s}`;
-  };
-
-  // ----------------------
-  // ارسال کد OTP
-  // ----------------------
-  const handleSendOtp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (timer > 0) return; // جلوگیری از ارسال تا پایان تایمر
-
-    setIsSubmitting(true);
-
-    try {
-      await CheckPhoneAction(mobile);
-      const otpRes = await sendOtpToUser(mobile);
-
-      setOtpId(otpRes);
-      alert(otpRes)
-      setOtpSent(true);
-
-      toast.success("کد تایید ارسال شد");
-
-      // شروع تایمر
-      setTimer(totalTime);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // ----------------------
-  // تایید کد
-  // ----------------------
-  const handleVerifyOtp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!otpId) return;
-
-    try {
-      const res = await fetch("/api/verifyOtp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ otpId, enteredOtp }),
-      });
-
-      const data = await res.json();
-
-      if (!data.success) {
-        toast.error(data.message || "کد اشتباه است");
-        return;
-      }
-
-      toast.success("ورود با موفقیت انجام شد");
-
-      signIn("credentials", {
-        mobile,
-        callbackUrl: "/",
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  return (
-    <div className="max-w-sm mx-auto p-4">
-      {!otpSent ? (
-        <form onSubmit={handleSendOtp}>
-          <input
-            type="tel"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
-            placeholder="شماره تماس را وارد کنید"
-            className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-
-          <button
-            type="submit"
-            disabled={isSubmitting || timer > 0}
-            className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50"
-          >
-            {isSubmitting ? "در حال ارسال..." : "ارسال کد تایید"}
-          </button>
-
-          {timer > 0 && (
-            <p className="text-center mt-3 text-gray-600">
-              ارسال مجدد پس از: <strong>{formatTime(timer)}</strong>
-            </p>
-          )}
-        </form>
-      ) : (
-        <form onSubmit={handleVerifyOtp}>
-          <input
-            type="text"
-            value={enteredOtp}
-            onChange={(e) => setEnteredOtp(e.target.value)}
-            placeholder="کد تایید را وارد کنید"
-            className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-green-500 outline-none"
-          />
-
-          <button className="w-full bg-green-500 text-white py-2 rounded">
-            تایید کد
-          </button>
-
-          {/* دکمه ارسال مجدد */}
-          {timer > 0 ? (
-            <p className="text-center mt-3 text-gray-600">
-              امکان ارسال مجدد تا: <strong>{formatTime(timer)}</strong>
-            </p>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSendOtp}
-              className="w-full bg-gray-200 text-black py-2 rounded mt-3"
-            >
-              ارسال مجدد کد
-            </button>
-          )}
-        </form>
-      )}
-    </div>
-  );
-}
