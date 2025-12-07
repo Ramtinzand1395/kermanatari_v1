@@ -15,6 +15,7 @@ export default function UserBtn({
   activeDropdown,
 }: UserBtnProps) {
   const { data: session } = useSession();
+
   return (
     <>
       {session ? (
@@ -25,7 +26,7 @@ export default function UserBtn({
         >
           <div className=" items-center gap-2 cursor-pointer hidden md:flex">
             <span className=" text-sm text-black">
-              {session.user?.name || "کاربر"}
+              {session.user?.username}
             </span>
             <ChevronDown className="text-black w-4 h-4" />
           </div>

@@ -3,7 +3,7 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
   compiler: {
-    removeConsole: true,
+  removeConsole: process.env.NODE_ENV === "production",
   },
   // این مهم‌ترین بخش:
   browserslist: {

@@ -1,9 +1,14 @@
-import React from 'react'
+"use client"
 
-const page = () => {
+import { useEffect } from "react";
+
+const Home = () => {
+
   return (
-    <div>page</div>
+    <div>
+      ff
+    </div>
   )
 }
 
-export default page
+export default Home
