@@ -11,6 +11,7 @@ import Skeleton from "react-loading-skeleton";
 // !فرم ولیدیشن
 // !خبرنامه
 // !تغییر شماره موبایل
+// !درست کردن سایدبار
 export default function Profile() {
   const [editField, setEditField] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
