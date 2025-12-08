@@ -26,7 +26,11 @@ const UserSchema = new Schema<IUser>(
     username: { type: String, default: "کاربر", required: true },
     email: { type: String, sparse: true },
     mobile: { type: String, unique: true, required: true },
-    role: { type: String, default: "user" },
+    role: {
+      type: String,
+      enum: ["user", "admin", "superadmin"],
+      default: "user",
+    },
     newsletter: { type: Boolean, default: true },
     gender: { type: String },
     birthday: { type: Date },

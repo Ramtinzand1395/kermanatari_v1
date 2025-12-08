@@ -137,7 +137,7 @@ export default function Profile() {
 
       {/* فرم ادیت */}
       {editField && (
-        <div className="border p-4 rounded-xl shadow bg-white min-h-[200px]">
+        <div className="border p-4 rounded-xl shadow bg-white min-h-[100px] h-fit">
           <div className="space-y-3">
             <p className="font-semibold text-gray-700 mb-2">
               ویرایش {fields.find((f) => f.key === editField)?.label}

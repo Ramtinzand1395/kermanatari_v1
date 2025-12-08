@@ -24,6 +24,7 @@ export const authOptions: NextAuthOptions = {
           id: user._id.toString(),
           mobile: user.mobile,
           username: user.username, // اگر دارید
+          role: user.role,
         };
       },
     }),
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id as string,
           mobile: token.mobile as string,
           username: token.username as string,
+          role: token.role as string,
         };
       }
       return session;
@@ -44,6 +46,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.mobile = user.mobile;
         token.username = user.username;
+        token.role = user.role;
       }
       return token;
     },

@@ -40,8 +40,7 @@ export default function UserBtn({
                 transition={{ duration: 0.25 }}
                 className="absolute left-0 top-10 w-48 bg-white shadow-lg rounded-xl border border-gray-200 p-3 z-50"
               >
-                {/* {session.user && session.user.role === "user" ? ( */}
-                {session.user ? (
+                {session.user && session.user.role === "user" ? (
                   <>
                     <Link
                       href="/my-profile"
