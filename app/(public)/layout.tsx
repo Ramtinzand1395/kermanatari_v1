@@ -1,10 +1,12 @@
 import "@/app/globals.css";
+import "react-loading-skeleton/dist/skeleton.css";
+
 import localFont from "next/font/local";
 import Script from "next/script";
 import { ToastContainer } from "react-toastify";
 import AuthProvider from "../AuthProvider";
 import Navbar from "./(navbar)/Navbar";
-// import Footer from "./Footer";
+import Footer from "./Footer";
 
 const vazir = localFont({
   src: "../Vazir.woff2",
@@ -70,7 +72,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           <main id="content">{children}</main>
-          {/* <Footer /> */}
+          <Footer />
         </AuthProvider>
 
         {/* Toast notifications (client-only) */}

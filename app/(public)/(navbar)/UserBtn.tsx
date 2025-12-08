@@ -72,7 +72,7 @@ export default function UserBtn({
                 )}
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="w-full text-left flex items-center gap-2 text-red-600 hover:text-red-700 transition text-sm py-2"
+                  className="w-full text-left flex items-center gap-2 text-red-600 hover:text-red-700 transition text-sm py-2 cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

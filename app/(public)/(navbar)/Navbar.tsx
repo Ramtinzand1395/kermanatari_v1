@@ -118,7 +118,7 @@ export default function Navbar() {
             height={30}
             alt="لوگوی کرمان آتاری"
             src="/atari-seeklogo.svg"
-            className="w-10 h-10"
+            className="w-8 h-8"
             priority
           />
           <h1 className="text-black font-bold md:text-lg text-base">

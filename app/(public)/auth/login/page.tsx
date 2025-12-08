@@ -1,9 +1,17 @@
 "use client";
+// todo
+// اضافه کردن اعتبار سنجی
+// !اضافه کرئدن sitemap,robot.ts
+// !سرچ محصولات اضافه بشه
+// !ریسپانسیو صفحه ارسال کد
+// !زدن خودکار کد بعد از sms
 import { useState, useEffect } from "react";
 import { CheckPhoneAction } from "@/helpers/CheckPhoneAction";
 import { sendOtpToUser } from "@/helpers/sendSms";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
+import Image from "next/image";
+import { mobileSchema } from "@/validations/validation";
 
 export default function LoginWithOtp() {
   const [mobile, setMobile] = useState("");
@@ -11,7 +19,7 @@ export default function LoginWithOtp() {
   const [enteredOtp, setEnteredOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpId, setOtpId] = useState<string | null>(null);
-
+  const [Errors, setErrors] = useState("");
   // ----------------------
   // تایمر + ذخیره LocalStorage
   // ----------------------
@@ -61,6 +69,7 @@ export default function LoginWithOtp() {
     setIsSubmitting(true);
 
     try {
+      await mobileSchema.validate(mobile);
       await CheckPhoneAction(mobile);
       const otpRes = await sendOtpToUser(mobile);
 
@@ -121,61 +130,76 @@ export default function LoginWithOtp() {
   };
 
   return (
-    <div className="max-w-sm mx-auto p-4">
-      {!otpSent ? (
-        <form onSubmit={handleSendOtp}>
-          <input
-            type="tel"
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
-            placeholder="شماره تماس را وارد کنید"
-            className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-
-          <button
-            type="submit"
-            disabled={isSubmitting || timer > 0}
-            className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50"
-          >
-            {isSubmitting ? "در حال ارسال..." : "ارسال کد تایید"}
-          </button>
-
-          {timer > 0 && (
-            <p className="text-center mt-3 text-gray-600">
-              ارسال مجدد پس از: <strong>{formatTime(timer)}</strong>
-            </p>
-          )}
-        </form>
-      ) : (
-        <form onSubmit={handleVerifyOtp}>
-          <input
-            type="text"
-            value={enteredOtp}
-            onChange={(e) => setEnteredOtp(e.target.value)}
-            placeholder="کد تایید را وارد کنید"
-            className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-green-500 outline-none"
-          />
-
-          <button className="w-full bg-green-500 text-white py-2 rounded">
-            تایید کد
-          </button>
-
-          {/* دکمه ارسال مجدد */}
-          {timer > 0 ? (
-            <p className="text-center mt-3 text-gray-600">
-              امکان ارسال مجدد تا: <strong>{formatTime(timer)}</strong>
-            </p>
-          ) : (
+    <div className="flex items-center justify-center h-screen flex-col">
+      <Image
+        width={30}
+        height={30}
+        alt="لوگوی کرمان آتاری"
+        src="/atari-seeklogo.svg"
+        className="w-30 h-30 mb-10"
+        priority
+      />
+      <div className="max-w-md mx-auto  bg-white p-5">
+        <h2 className="font-semibold mb-6">ورود به کرمان آتاری</h2>
+        {!otpSent ? (
+          <form onSubmit={handleSendOtp}>
+            <label htmlFor="">شماره موبایل *</label>
+            <input
+              type="tel"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              placeholder="شماره موبایل را وارد کنید"
+              className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <span className="text-xs">
+              با ورود به کرمان آتاری شرایط مبیت و قوانین حریم ‌خصوصی آن را
+              می‌پذیرید.
+            </span>
             <button
-              type="button"
-              onClick={sendOtp}
-              className="w-full bg-gray-200 text-black py-2 rounded mt-3"
+              type="submit"
+              disabled={isSubmitting || timer > 0}
+              className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50 mt-5"
             >
-              ارسال مجدد کد
+              {isSubmitting ? "در حال ارسال..." : "ارسال کد تایید"}
             </button>
-          )}
-        </form>
-      )}
+
+            {timer > 0 && (
+              <p className="text-center mt-3 text-gray-600">
+                ارسال مجدد پس از: <strong>{formatTime(timer)}</strong>
+              </p>
+            )}
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp}>
+            <input
+              type="text"
+              value={enteredOtp}
+              onChange={(e) => setEnteredOtp(e.target.value)}
+              placeholder="کد تایید را وارد کنید"
+              className="w-full border px-4 py-3 rounded mb-3 focus:ring-2 focus:ring-green-500 outline-none"
+            />
+
+            <button className="w-full bg-green-500 text-white py-2 rounded">
+              تایید کد
+            </button>
+
+            {/* دکمه ارسال مجدد */}
+            {timer > 0 ? (
+              <p className="text-center mt-3 text-gray-600">
+                امکان ارسال مجدد تا: <strong>{formatTime(timer)}</strong>
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={sendOtp}
+                className="w-full bg-gray-200 text-black py-2 rounded mt-3"
+              >
+                ارسال مجدد کد
+              </button>
+            )}
+          </form>
+        )}
+      </div>
     </div>
   );
 }
