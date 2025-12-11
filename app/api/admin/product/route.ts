@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/mongodb";
 import Product from "@/model/Product";
+import { data } from "framer-motion/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -49,9 +50,7 @@ export async function POST(req: Request) {
     const product = await Product.create(productData);
     return NextResponse.json({ message: "محصول جدید ساخته شد.", product });
   } catch (err) {
-    return NextResponse.json(
-      { message: "محصول جدید ساخته نشد." },
-      { status: 500 }
-    );
+    console.log(err);
+    return NextResponse.json({ message: err }, { status: 500 });
   }
 }

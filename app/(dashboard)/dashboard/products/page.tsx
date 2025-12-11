@@ -18,7 +18,6 @@ import {
   Trash2,
 } from "lucide-react";
 import StatsCard from "../components/StatsCard";
-import UpdateProductModal from "../components/modals/UpdateProductModal";
 import AddProductDrawer from "../components/drawers/AddProductDrawer";
 import { formatPrice } from "@/helpers/Price";
 export default function ProductsPage() {
@@ -293,7 +292,8 @@ export default function ProductsPage() {
 
       {/* Edit/Create Modal */}
       {isModalOpen && (
-        <UpdateProductModal
+        <AddProductDrawer
+          onClose={() => setIsModalOpen(false)}
           onUpdated={(updatedProduct) => {
             setProducts((prev) =>
               prev.map((p) =>
@@ -301,11 +301,15 @@ export default function ProductsPage() {
               )
             );
           }}
-          onClose={() => setIsModalOpen(false)}
           product={selectedProduct}
         />
       )}
-      {OpenAdd && <AddProductDrawer onClose={closeDrawer} />}
+      {OpenAdd && (
+        <AddProductDrawer
+          onClose={closeDrawer}
+          onSave={(newProduct) => setProducts((prev) => [...prev, newProduct])}
+        />
+      )}
     </div>
   );
 }

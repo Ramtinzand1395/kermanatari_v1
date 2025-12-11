@@ -1,50 +1,45 @@
 "use client";
 
+import * as yup from "yup";
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
-import Image from "next/image";
-import { Category, Tag } from "@/types";
-// !فرم ولیدیشن
-// todo
-// !جدا کرئن دسته بندی از مادر ها
-// !اندازه دسته بندی و تگ ها
-// !لودینگ عکس ها
-interface ProductForm {
-  title: string;
-  slug: string;
-  price: number;
-  discountPrice?: number;
-  stock: number;
-  brand: string;
-  description: string;
-  shortDesc: string;
-  category?: string;
-  tags: string[];
-  mainImage: string; // فقط URL
-  galleryImages: string[]; // URL[]
-  specifications: { title: string; items: { key: string; value: string }[] }[];
-}
+import { Category, Product, ProductForm, Tag } from "@/types";
+import CategorySelector from "../modals/updateProduct/CategorySelector";
+import GalleryUploader from "../modals/updateProduct/GalleryUploader";
+import ImageUploader from "../modals/updateProduct/ImageUploader";
+import TagsSelector from "../modals/updateProduct/TagsSelector";
+import SpecificationsEditor from "../modals/updateProduct/SpecificationsEditor";
+import BasicInfoFields from "../modals/updateProduct/BasicInfoFields";
+import { productValidationSchema } from "@/validations/validation";
 
 interface Props {
   onClose: () => void;
+  onSave?: (newProduct: Product) => void;
+  onUpdated?: (updatedProduct: Product) => void;
+  product?: Product | null;
 }
 
-export default function AddProductDrawer({ onClose }: Props) {
+export default function AddProductDrawer({
+  onClose,
+  onSave,
+  product,
+  onUpdated,
+}: Props) {
   const [form, setForm] = useState<ProductForm>({
-    title: "",
-    slug: "",
-    price: 0,
-    discountPrice: undefined,
-    stock: 0,
-    brand: "",
-    description: "",
-    shortDesc: "",
-    category: undefined,
-    mainImage: "",
-    galleryImages: [],
-    specifications: [],
-    tags: [],
+    title: product?.title || "",
+    slug: product?.slug || "",
+    price: product?.price || 0,
+    discountPrice: product?.discountPrice || null,
+    stock: product?.stock || 0,
+    brand: product?.brand || "",
+    description: product?.description || "",
+    shortDesc: product?.shortDesc || "",
+    category: product?.category?._id || "",
+    mainImage: product?.mainImage || "",
+    galleryImages: product?.images || [],
+    tags: product?.tags?.map((t: Tag) => t._id) || [],
+    specifications: product?.specifications || [],
   });
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -74,74 +69,57 @@ export default function AddProductDrawer({ onClose }: Props) {
       .then(setTagsList)
       .catch(() => toast.error("خطا در دریافت تگ‌ها"));
   }, []);
-
-  // ---------------------------
-  // ⬆⬆⬆ آپلود Cloudinary
-  // ---------------------------
-  const uploadToCloudinary = async (file: File) => {
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append(
-      "upload_preset",
-      process.env.NEXT_PUBLIC_CLOUDINARY_PRESET as string
-    );
-
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD}/image/upload`,
-      {
-        method: "POST",
-        body: fd,
+  // ==========================
+  // 📌 Upadte
+  // ==========================
+  const handleUpdate = async (): Promise<void> => {
+    try {
+      productValidationSchema.validateSync(form, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        err.inner.forEach((e) => toast.error(e.message));
+      } else {
+        toast.error("خطای ناشناخته");
       }
-    );
-    const data = await res.json();
-    return data.secure_url as string;
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/product/${product?._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      const updatedProduct = await res.json();
+      {
+        onUpdated && onUpdated(updatedProduct);
+      }
+      toast.success("محصول با موفقیت بروزرسانی شد");
+      onClose();
+    } catch {
+      toast.error("خطا در بروزرسانی محصول");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  // ---------------------------
-  // ⬆⬆⬆ انتخاب عکس اصلی
-  // ---------------------------
-  const handleMainImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    toast.info("در حال آپلود تصویر اصلی...");
-    const url = await uploadToCloudinary(file);
-    updateField("mainImage", url);
-    toast.success("تصویر اصلی با موفقیت آپلود شد");
-  };
-
-  // ---------------------------
-  // ⬆⬆⬆ انتخاب گالری
-  // ---------------------------
-  const handleGallery = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    toast.info("در حال آپلود تصاویر گالری...");
-
-    const uploaded = await Promise.all(files.map((f) => uploadToCloudinary(f)));
-
-    updateField("galleryImages", [...form.galleryImages, ...uploaded]);
-
-    toast.success("تمام تصاویر با موفقیت آپلود شدند");
-  };
-
   // ---------------------------
   // ⬆⬆⬆ Submit
   // ---------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !form.title ||
-      !form.slug ||
-      !form.price ||
-      !form.mainImage ||
-      !form.category
-    )
-      return toast.warning(
-        "عنوان، اسلاگ، قیمت و تصویر و دسته بندی اصلی الزامی است"
-      );
+    try {
+      productValidationSchema.validateSync(form, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        err.inner.forEach((e) => toast.error(e.message));
+      } else {
+        toast.error("خطای ناشناخته");
+      }
+      return;
+    }
 
     setLoading(true);
 
@@ -153,7 +131,9 @@ export default function AddProductDrawer({ onClose }: Props) {
       });
 
       const data = await res.json();
-
+      {
+        onSave && (await onSave(data.product));
+      }
       if (res.ok) {
         toast.success("محصول با موفقیت اضافه شد");
 
@@ -172,8 +152,11 @@ export default function AddProductDrawer({ onClose }: Props) {
           specifications: [],
           tags: [],
         });
+        onClose();
       } else {
         toast.error(data.error || "خطا در اضافه کردن محصول");
+        toast.error(data.message.errorResponse.errmsg);
+
         console.log(data.error);
       }
     } catch (err) {
@@ -184,53 +167,11 @@ export default function AddProductDrawer({ onClose }: Props) {
     }
   };
 
-  // ---------------------------
-  // تگ‌ها
-  // ---------------------------
-
-  const updateSpec = <K extends keyof ProductForm["specifications"][0]>(
-    specIndex: number,
-    key: K,
-    value: ProductForm["specifications"][0][K]
-  ) => {
-    const specs = [...form.specifications];
-    specs[specIndex][key] = value;
-    updateField("specifications", specs);
-  };
-
-  const updateSpecItem = (
-    specIndex: number,
-    itemIndex: number,
-    key: "key" | "value",
-    value: string
-  ) => {
-    const specs = [...form.specifications];
-    specs[specIndex].items[itemIndex][key] = value;
-    updateField("specifications", specs);
-  };
-
-  const addSpec = () =>
-    updateField("specifications", [
-      ...form.specifications,
-      { title: "", items: [] },
-    ]);
-  const addSpecItem = (specIndex: number) => {
-    const specs = [...form.specifications];
-    specs[specIndex].items.push({ key: "", value: "" });
-    updateField("specifications", specs);
-  };
-  const removeSpecItem = (specIndex: number, itemIndex: number) => {
-    const specs = [...form.specifications];
-    specs[specIndex].items.splice(itemIndex, 1);
-    updateField("specifications", specs);
-  };
-
-  // --------------------------- UI -----------------------------
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
 
-      <div className="relative bg-[#001A6E] text-white w-96 p-6 overflow-y-auto">
+      <div className="relative bg-indigo-600  text-white w-96 p-6 overflow-y-auto">
         <button
           title="close"
           onClick={onClose}
@@ -241,225 +182,54 @@ export default function AddProductDrawer({ onClose }: Props) {
 
         <h2 className="text-xl mb-4 font-bold">افزودن محصول جدید</h2>
 
-        <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-          {/* فیلدهای متن */}
-          {(
-            ["title", "slug", "brand", "shortDesc"] as (keyof ProductForm)[]
-          ).map((field) => (
-            <input
-              key={field}
-              type="text"
-              placeholder={field}
-              value={form[field] as string}
-              onChange={(e) =>
-                updateField(field as keyof ProductForm, e.target.value)
-              }
-              className="p-2 rounded bg-[#010c32]"
-            />
-          ))}
+        <form
+          className="flex flex-col gap-3"
+          onSubmit={product ? handleUpdate : handleSubmit}
+        >
+          {/* فیلدهای  */}
 
-          <textarea
-            placeholder="توضیحات"
-            value={form.description}
-            onChange={(e) => updateField("description", e.target.value)}
-            className="p-2 rounded bg-[#010c32]"
+          <BasicInfoFields form={form} updateField={updateField} />
+          {/* دسته‌بندی */}
+          <CategorySelector
+            form={form}
+            updateField={updateField}
+            categories={categories}
           />
 
-          {/* عددی‌ها */}
-          {(["price", "discountPrice", "stock"] as (keyof ProductForm)[]).map(
-            (field) => (
-              <div className="flex flex-col" key={field}>
-                <label>{field}</label>
-                <input
-                  type="number"
-                  placeholder={field}
-                  value={(form[field] as number) ?? ""}
-                  onChange={(e) =>
-                    updateField(
-                      field as keyof ProductForm,
-                      Number(e.target.value)
-                    )
-                  }
-                  className="p-2 rounded bg-[#010c32]"
-                />
-              </div>
-            )
-          )}
-
-          {/* دسته‌بندی */}
-
-          <select
-            title="category"
-            value={form.category ?? ""}
-            onChange={(e) => updateField("category", e.target.value)} // بدون Number()
-            className="p-2 rounded bg-[#010c32]"
-          >
-            <option value="">انتخاب دسته‌بندی</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
-                {cat.parent ? `${cat.parent.name} / ${cat.name}` : cat.name}
-              </option>
-            ))}
-          </select>
-
           {/* عکس اصلی */}
-          <div>
-            <p className="mb-1">تصویر اصلی:</p>
-            <input
-              title="file"
-              type="file"
-              accept="image/*"
-              onChange={handleMainImage}
-            />
-
-            {form.mainImage && (
-              <Image
-                alt="mainImage"
-                width={50}
-                height={25}
-                src={form.mainImage}
-                className=" object-cover rounded mt-2 w-20 h-10"
-              />
-            )}
-          </div>
+          <GalleryUploader form={form} updateField={updateField} />
 
           {/* گالری */}
-          <div>
-            <p className="mb-1">گالری تصاویر:</p>
-            <input
-              title="mainImage"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleGallery}
-            />
-
-            {form.galleryImages.map((url, i) => (
-              <Image
-                width={50}
-                height={25}
-                alt="galleryImages"
-                key={i}
-                src={url}
-                className=" object-cover rounded mt-2 w-20 h-10"
-              />
-            ))}
-          </div>
+          <ImageUploader form={form} updateField={updateField} />
           {/* تگ‌ها */}
 
-          <div>
-            <p className="mb-1 font-bold">انتخاب تگ‌ها:</p>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {tagsList.map((tag) => (
-                <button
-                  key={tag._id}
-                  type="button"
-                  onClick={() => {
-                    if (!form.tags.includes(tag._id)) {
-                      updateField("tags", [...form.tags, tag._id]);
-                    } else {
-                      updateField(
-                        "tags",
-                        form.tags.filter((id) => id !== tag._id)
-                      );
-                    }
-                  }}
-                  className={`px-2 py-1 rounded text-xs ${
-                    form.tags.includes(tag._id)
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-600 text-gray-200"
-                  }`}
-                >
-                  {tag.name}
-                </button>
-              ))}
-            </div>
-          </div>
+          <TagsSelector
+            form={form}
+            updateField={updateField}
+            tagsList={tagsList}
+          />
 
           {/* مشخصات */}
-          <div>
-            <p className="mb-1 font-bold">مشخصات:</p>
-            {form.specifications.map((spec, specIndex) => (
-              <div
-                key={specIndex}
-                className="mb-2 border border-gray-600 p-2 rounded"
-              >
-                <input
-                  type="text"
-                  placeholder="تیتر مشخصات"
-                  value={spec.title}
-                  onChange={(e) =>
-                    updateSpec(specIndex, "title", e.target.value)
-                  }
-                  className="p-1 rounded bg-[#1A1D33] w-full mb-1"
-                />
-                {spec.items.map((item, itemIndex) => (
-                  <div key={itemIndex} className="flex flex-col gap-2 mb-1">
-                    <input
-                      type="text"
-                      placeholder="کلید"
-                      value={item.key}
-                      onChange={(e) =>
-                        updateSpecItem(
-                          specIndex,
-                          itemIndex,
-                          "key",
-                          e.target.value
-                        )
-                      }
-                      className="p-1 rounded bg-[#1A1D33] flex-1"
-                    />
-                    <div className="">
-                      <input
-                        type="text"
-                        placeholder="مقدار"
-                        value={item.value}
-                        onChange={(e) =>
-                          updateSpecItem(
-                            specIndex,
-                            itemIndex,
-                            "value",
-                            e.target.value
-                          )
-                        }
-                        className="p-1 rounded bg-[#1A1D33] flex-1"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeSpecItem(specIndex, itemIndex)}
-                        className="bg-red-600 p-1 rounded text-xs"
-                      >
-                        x
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addSpecItem(specIndex)}
-                  className="bg-green-600 p-1 rounded text-xs"
-                >
-                  + آیتم
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addSpec}
-              className="bg-blue-600 p-2 rounded text-sm mb-2"
-            >
-              + مشخصات جدید
-            </button>
-          </div>
+          <SpecificationsEditor form={form} updateField={updateField} />
 
           {/* دکمه ذخیره */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-green-600 p-2 rounded"
-          >
-            {loading ? "در حال ذخیره..." : "ذخیره"}
-          </button>
+          {product ? (
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-green-600 p-2 rounded"
+            >
+              {loading ? "در حال آپدیت..." : "آپدیت"}
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-green-600 p-2 rounded"
+            >
+              {loading ? "در حال ذخیره..." : "ذخیره"}
+            </button>
+          )}
         </form>
       </div>
     </div>

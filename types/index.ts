@@ -51,6 +51,22 @@ export interface OTP {
   otp: number;
   createdAt: string | Date;
 }
+// !برای فرم محصول
+export interface ProductForm {
+  title: string;
+  slug: string;
+  price: number;
+  discountPrice?: number | null;
+  stock: number;
+  brand: string;
+  description: string;
+  shortDesc: string;
+  category?: string;
+  tags: string[];
+  mainImage: string; // فقط URL
+  galleryImages: string[]; // URL[]
+  specifications: { title: string; items: { key: string; value: string }[] }[];
+}
 
 // !پاک بشه
 export interface Favorite {

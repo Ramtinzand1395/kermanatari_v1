@@ -1,29 +1,7 @@
 "use client";
 
-import { Tag } from "@/types";
-
-interface ProductForm {
-  title: string;
-  slug: string;
-  price: number;
-  discountPrice: number | null;
-  stock: number;
-  brand?: string;
-  description: string;
-  shortDesc?: string;
-  category: string;
-  mainImage: string;
-  galleryImages: string[];
-  tags: string[];
-  specifications: {
-    title: string;
-    items: {
-      key: string;
-      value: string;
-    }[];
-  }[];
-}
-
+import { ProductForm, Tag } from "@/types";
+ 
 interface TagsSelectorProps {
   form: ProductForm;
   tagsList: Tag[];

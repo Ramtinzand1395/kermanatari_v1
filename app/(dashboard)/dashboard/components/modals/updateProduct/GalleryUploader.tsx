@@ -1,30 +1,10 @@
 "use client";
 
+import { ProductForm } from "@/types";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "react-toastify";
-
-interface ProductForm {
-  title: string;
-  slug: string;
-  price: number;
-  discountPrice: number | null;
-  stock: number;
-  brand?: string;
-  description: string;
-  shortDesc?: string;
-  category: string;
-  mainImage: string;
-  galleryImages: string[];
-  tags: string[];
-  specifications: {
-    title: string;
-    items: {
-      key: string;
-      value: string;
-    }[];
-  }[];
-}
+ 
 
 interface GalleryUploaderProps {
   form: ProductForm;

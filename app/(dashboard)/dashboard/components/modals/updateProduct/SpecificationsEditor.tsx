@@ -1,26 +1,9 @@
 "use client";
 
-interface ProductForm {
-  title: string;
-  slug: string;
-  price: number;
-  discountPrice: number | null;
-  stock: number;
-  brand?: string;
-  description: string;
-  shortDesc?: string;
-  category: string;
-  mainImage: string;
-  galleryImages: string[];
-  tags: string[];
-  specifications: {
-    title: string;
-    items: {
-      key: string;
-      value: string;
-    }[];
-  }[];
-}
+import { ProductForm } from "@/types";
+
+ 
+
 
 interface SpecificationsEditorProps {
   form: ProductForm;
@@ -125,6 +108,7 @@ const SpecificationsEditor = ({
               </div>
             ))}
             <button
+              type="button"
               onClick={() => addSpecItem(sIndex)}
               className="bg-green-600 text-white rounded px-2 py-1 text-xs mt-1"
             >
@@ -133,6 +117,7 @@ const SpecificationsEditor = ({
           </div>
         ))}
         <button
+          type="button"
           onClick={addSpec}
           className="bg-blue-600 text-white rounded px-4 py-2 mt-2"
         >
