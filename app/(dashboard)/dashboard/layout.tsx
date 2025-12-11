@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthProvider from "@/app/AuthProvider";
 import DashboardSidebar from "./components/DashboardSidebar";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const vazir = localFont({
   src: "./Vazir.woff2",

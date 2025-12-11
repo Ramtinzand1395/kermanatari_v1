@@ -52,7 +52,7 @@ export interface OTP {
   createdAt: string | Date;
 }
 
-// !پاک بشه 
+// !پاک بشه
 export interface Favorite {
   id: number;
   userId: number;
@@ -96,19 +96,16 @@ export interface Comment {
 }
 
 export interface Category {
-  id: number;
+  _id: string;
   name: string;
   slug: string;
-  parentId?: number;
   createdAt: string;
   updatedAt: string;
-  parent?: Category;
-  subcategories: Category[];
-  products: Product[];
+  parent?: { _id: string; name: string } | null;
 }
 
 export interface Product {
-  id: number;
+  _id: string;
   sku: string;
   title: string;
   slug: string;
@@ -123,9 +120,8 @@ export interface Product {
   updatedAt: string;
   userId?: number;
   categoryId: number;
-
   tags: Tag[];
-  images: ProductImage[];
+  images: string[];
   specifications: Specification[];
   comments: Comment[];
   favorites: Favorite[];
@@ -134,10 +130,9 @@ export interface Product {
   User?: User;
 }
 export interface Tag {
-  id: number;
+  _id: string;
   name: string;
   slug: string;
-  products: Product[];
 }
 export interface Favorite {
   id: number;
@@ -154,16 +149,10 @@ export interface OrderItem {
   quantity: number;
   price: number;
   total: number;
-
   order: Order;
   product: Product;
 }
-export interface ProductImage {
-  id: number;
-  url: string;
-  productId: number;
-  product: Product;
-}
+
 export interface Order {
   id: number;
   userId?: number;
@@ -196,8 +185,6 @@ export interface Comment {
   user?: User;
   product?: Product;
 }
-
-
 
 export interface Address {
   id: number;

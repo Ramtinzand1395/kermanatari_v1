@@ -15,16 +15,19 @@ import {
   PlusCircle,
   Plus,
 } from "lucide-react";
-// import AddProductDrawer from "./drawers/AddProductDrawer";
-// import AddCategoryDrawer from "./drawers/AddCategoryDrawer";
+import AddProductDrawer from "./drawers/AddProductDrawer";
+import AddCategoryDrawer from "./drawers/AddCategoryDrawer";
+import AddTagDrawer from "./drawers/AddTagDrawer";
+
 type DrawerAction =
   | "addProduct"
   | "addGame"
   | "addImage"
   | "addCategory"
+  | "addTag"
   | null;
 // --- Navigation Items ---
-export const navItems: NavItem[]  = [
+export const navItems: NavItem[] = [
   { label: "صفحه اصلی ", href: "/", icon: Home },
 
   { label: "داشبورد", href: "/dashboard", icon: Layers3 },
@@ -38,6 +41,7 @@ export const navItems: NavItem[]  = [
       { label: "لیست محصولات", href: "/dashboard/products", icon: ShoppingBag },
       { label: "افزودن محصول جدید", action: "addProduct", icon: PlusCircle },
       { label: "دسته‌بندی‌ها", action: "addCategory", icon: Tag },
+      { label: "تگ ها", action: "addTag", icon: Tag },
     ],
   },
 
@@ -84,7 +88,7 @@ export default function DashboardSidebar() {
   };
 
   const [activeDrawer, setActiveDrawer] = useState<
-    null | "addProduct" | "addGame" | "addImage" | "addCategory"
+    null | "addProduct" | "addGame" | "addImage" | "addCategory" | "addTag"
   >(null);
 
   const handleAction = (action?: DrawerAction) => {
@@ -99,7 +103,7 @@ export default function DashboardSidebar() {
       <button
         title="MobileOpen"
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-4 right-4 z-50 bg-[#001A6E] text-white p-2 rounded-lg shadow-md"
+        className="md:hidden fixed top-4 right-4 z-50 bg-indigo-600  text-white p-2 rounded-lg shadow-md"
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -114,7 +118,7 @@ export default function DashboardSidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 right-0 h-full bg-[#001A6E] text-white shadow-lg flex flex-col z-50
+        className={`fixed md:static top-0 right-0 h-full bg-indigo-600  text-white shadow-lg flex flex-col z-50
         transition-all duration-300
         ${expanded ? "md:w-64" : "md:w-16"}
         ${
@@ -233,12 +237,13 @@ export default function DashboardSidebar() {
         </nav>
       </aside>
       {/* دراورها */}
-      {/* {activeDrawer === "addProduct" && (
+      {activeDrawer === "addProduct" && (
         <AddProductDrawer onClose={closeDrawer} />
       )}
-       {activeDrawer === "addCategory" && (
+      {activeDrawer === "addCategory" && (
         <AddCategoryDrawer onClose={closeDrawer} />
-      )} */}
+      )}
+      {activeDrawer === "addTag" && <AddTagDrawer onClose={closeDrawer} />}
     </>
   );
 }
