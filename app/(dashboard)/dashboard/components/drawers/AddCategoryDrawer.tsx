@@ -70,7 +70,7 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("آیا از حذف این دسته مطمئن هستید؟")) return;
     console.log(id)
     try {
