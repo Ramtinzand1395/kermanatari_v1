@@ -30,7 +30,7 @@ export default function FavoritesPage() {
     }
   };
 
-  const removeFavorite = async (productId: number) => {
+  const removeFavorite = async (productId: string) => {
     try {
       const res = await fetch("/api/users_data/favorites", {
         method: "DELETE",
@@ -44,7 +44,7 @@ export default function FavoritesPage() {
         return;
       }
 
-      setFavorites((prev) => prev.filter((p) => p.id !== productId));
+      setFavorites((prev) => prev.filter((p) => p._id !== productId));
       toast.info("محصول از علاقه‌مندی‌ها حذف شد");
     } catch (err) {
       console.error(err);
@@ -65,7 +65,7 @@ export default function FavoritesPage() {
       ) : (
         favorites.map((product) => (
           <div
-            key={product.id}
+            key={product._id}
             className="border rounded-lg p-2 hover:shadow-lg transition relative bg-white flex flex-col"
           >
             <Image
@@ -82,7 +82,7 @@ export default function FavoritesPage() {
               {product.price.toLocaleString()} تومان
             </p>
             <button
-              onClick={() => removeFavorite(product.id)}
+              onClick={() => removeFavorite(product._id)}
               className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
             >
               حذف
