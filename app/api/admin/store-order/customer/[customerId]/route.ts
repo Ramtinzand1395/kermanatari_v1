@@ -1,12 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Customer from "@/model/Customer";
 
-interface Params {
-  customerId: string;
-}
-
-export async function PUT(req: Request, { params }: { params: Params }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ customerId: string }> }
+) {
   await dbConnect();
 
   try {

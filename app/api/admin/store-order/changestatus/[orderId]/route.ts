@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import moment from "moment-jalaali";
 import senSMS from "@/helpers/CustomerSms";
 import { getServerSession } from "next-auth";
@@ -22,9 +22,13 @@ function toPersianDigits(str: string) {
   return str.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d]);
 }
 
+// (
+//   req: NextRequest,
+//   { params }: { params: Promise<{ orderId: string }> }
+// )
 export async function PUT(
-  req: Request,
-  { params }: { params: { orderId: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   const session = await getServerSession(authOptions);
 
