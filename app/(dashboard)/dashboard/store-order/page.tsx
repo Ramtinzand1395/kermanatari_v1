@@ -18,6 +18,7 @@ type OrdersByConsole = {
 // todo
 // loding skeleton
 // realtime
+// مدال آپدیت ps4مشکل داره
 export default function StoreOrder() {
   const [OpenAddItem, setOpenAddItem] = useState(false);
 
