@@ -1,7 +1,7 @@
 "use client";
 
 import { storeOrder } from "@/types";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { toPersianDate } from "@/helpers/toPersianDate";
 import { useSearchParams } from "next/navigation";
@@ -39,6 +39,7 @@ export default function AllStoreOrders() {
   }, [searchParams, page]);
 
   return (
+    <Suspense fallback={<div>در حال بارگذاری...</div>}>
     <div className="w-full md:container md:mx-auto mx-2 my-10">
       <FilterOrders />
 
@@ -120,5 +121,6 @@ export default function AllStoreOrders() {
         </div>
       </div>
     </div>
+    </Suspense>
   );
 }
