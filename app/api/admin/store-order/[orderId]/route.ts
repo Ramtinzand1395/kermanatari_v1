@@ -1,19 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import StoreOrder from "@/model/StoreOrder";
 
-interface Params {
-  orderId: string;
-}
-
 export async function PUT(
-  req: Request,
-  context: { params: Promise<Params> } // ⚠ حتما Promise
-): Promise<NextResponse> {
+  req: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
+) {
   await dbConnect();
 
   try {
-    const { orderId } = await context.params;
+    const { orderId } = await params;
     const body = await req.json();
     const { list, price, consoleType, description } = body;
     const order = await StoreOrder.findById(orderId);
@@ -40,13 +36,13 @@ export async function PUT(
 
 /* ===================== DELETE ===================== */
 export async function DELETE(
-  req: Request,
-  context: { params: Promise<Params> } // ⚠ حتما Promise
-): Promise<NextResponse> {
+  req: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
+) {
   await dbConnect();
 
   try {
-    const { orderId } = await context.params;
+    const { orderId } = await params;
 
     const order = await StoreOrder.findByIdAndDelete(orderId);
 
