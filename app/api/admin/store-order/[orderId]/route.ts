@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import StoreOrder from "@/model/StoreOrder";
 
-export async function PUT(
-  req: Request,
-  { params }: { params: { orderId: string } }
-) {
+interface Params {
+  orderId: string;
+}
+
+export async function PUT(req: Request, { params }: { params: Params }) {
   await dbConnect();
 
   try {
@@ -36,10 +37,7 @@ export async function PUT(
 
 // ==================delete===================
 /* ===================== DELETE ===================== */
-export async function DELETE(
-  req: Request,
-  { params }: { params: { orderId: string } }
-) {
+export async function DELETE(req: Request, { params }: { params: Params }) {
   await dbConnect();
 
   try {
