@@ -83,18 +83,26 @@ export default function AddTagDrawer({ onClose }: AddTagDrawerProps) {
   };
 
   return (
-    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex justify-end">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex justify-end"
+    >
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
         aria-label="بستن"
       />
 
-      <div className="relative bg-[#001A6E] text-white w-3/4 md:w-[340px] h-full p-5 shadow-2xl rounded-r-2xl">
+      <div className="relative bg-indigo-600 text-white w-3/4 md:w-[340px] h-full p-5 shadow-2xl rounded-r-2xl">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-base font-semibold">مدیریت تگ‌ها</h2>
-          <button aria-label="بستن پنجره" onClick={onClose} className="text-gray-300 hover:text-white transition">
+          <button
+            aria-label="بستن پنجره"
+            onClick={onClose}
+            className="text-gray-300 hover:text-white transition"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -124,18 +132,23 @@ export default function AddTagDrawer({ onClose }: AddTagDrawerProps) {
         </div>
 
         {/* List */}
-        <div className="overflow-y-auto max-h-[70vh]">
+        <div className=" bg-white/20 backdrop-blur-md border border-white/30 shadow-lg p-2 rounded-2xl  transition-all duration-300 h-[50vh] overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
               <Loader2 className="w-4 h-4 animate-spin" />
               در حال بارگذاری...
             </div>
           ) : tags.length === 0 ? (
-            <p className="text-gray-400 text-xs text-center">هنوز هیچ تگی وجود ندارد.</p>
+            <p className="text-gray-400 text-xs text-center">
+              هنوز هیچ تگی وجود ندارد.
+            </p>
           ) : (
-            <ul className="space-y-1 max-h-[50vh]">
+            <ul className="space-y-1 max-h-[50vh] grid grid-cols-2 gap-5">
               {tags.map((tag) => (
-                <li key={tag._id} className="flex justify-between items-center hover:bg-gray-700 p-2 rounded-md text-xs bg-[#0037ff]">
+                <li
+                  key={tag._id}
+                  className="flex justify-between items-center hover:bg-gray-700 p-2 rounded-md text-xs border-2"
+                >
                   <span className="font-medium">{tag.name}</span>
                   <button
                     onClick={() => handleDelete(tag._id)}

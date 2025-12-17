@@ -5,27 +5,23 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 import { Category, Product, ProductForm, Tag } from "@/types";
-import CategorySelector from "../modals/updateProduct/CategorySelector";
-import GalleryUploader from "../modals/updateProduct/GalleryUploader";
-import ImageUploader from "../modals/updateProduct/ImageUploader";
-import TagsSelector from "../modals/updateProduct/TagsSelector";
-import SpecificationsEditor from "../modals/updateProduct/SpecificationsEditor";
-import BasicInfoFields from "../modals/updateProduct/BasicInfoFields";
+import {
+  CategorySelector,
+  GalleryUploader,
+  ImageUploader,
+  TagsSelector,
+  SpecificationsEditor,
+  BasicInfoFields,
+} from "../modals";
 import { productValidationSchema } from "@/validations/validation";
 
 interface Props {
   onClose: () => void;
   onSave?: (newProduct: Product) => void;
-  onUpdated?: (updatedProduct: Product) => void;
   product?: Product | null;
 }
 
-export default function AddProductDrawer({
-  onClose,
-  onSave,
-  product,
-  onUpdated,
-}: Props) {
+export default function AddProductDrawer({ onClose, onSave, product }: Props) {
   const [form, setForm] = useState<ProductForm>({
     title: product?.title || "",
     slug: product?.slug || "",
@@ -93,9 +89,9 @@ export default function AddProductDrawer({
       });
       if (!res.ok) throw new Error();
       const updatedProduct = await res.json();
-      {
-        onUpdated && onUpdated(updatedProduct);
-      }
+
+      await onSave?.(updatedProduct);
+
       toast.success("محصول با موفقیت بروزرسانی شد");
       onClose();
     } catch {
@@ -131,9 +127,8 @@ export default function AddProductDrawer({
       });
 
       const data = await res.json();
-      {
-        onSave && (await onSave(data.product));
-      }
+      await onSave?.(data.product);
+
       if (res.ok) {
         toast.success("محصول با موفقیت اضافه شد");
 

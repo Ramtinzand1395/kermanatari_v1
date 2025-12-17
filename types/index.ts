@@ -68,6 +68,35 @@ export interface ProductForm {
   specifications: { title: string; items: { key: string; value: string }[] }[];
 }
 
+export interface Customer {
+  _id: string;
+  name: string;
+  mobile: string;
+  lastName: string;
+  createdAt: string;
+  updatedAt: string;
+  sex: string;
+  birthday: string;
+  description: string;
+}
+type ConsoleType = "ps5" | "ps4" | "xbox" | "copy";
+
+export interface storeOrder {
+  _id: string;
+  list: string[];
+  price: number | null;
+  customer?: Customer | string;
+  customerId?:string;
+  description: string;
+  consoleType: ConsoleType | string;
+  deliveryStatus: string;
+  createdAt: string;
+  updatedAt: string;
+  deliveryCode: string;
+  deliveryDate: string;
+}
+
+
 // !پاک بشه
 export interface Favorite {
   id: number;

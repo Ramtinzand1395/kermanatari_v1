@@ -72,7 +72,7 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
 
   const handleDelete = async (id: string) => {
     if (!confirm("آیا از حذف این دسته مطمئن هستید؟")) return;
-    console.log(id)
+    console.log(id);
     try {
       const res = await fetch(`/api/admin/category/${id}`, {
         method: "DELETE",
@@ -90,7 +90,6 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
     }
   };
 
-
   return (
     <div
       role="dialog"
@@ -103,7 +102,7 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
         aria-label="بستن"
       />
 
-      <div className="relative bg-[#001A6E] text-white w-3/4 md:w-[340px] h-full p-5 shadow-2xl rounded-r-2xl">
+      <div className="relative bg-indigo-600 text-white w-3/4 md:w-[340px] h-full p-5 shadow-2xl rounded-r-2xl">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-base font-semibold">مدیریت دسته‌بندی‌ها</h2>
@@ -158,7 +157,7 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
         </div>
 
         {/* List */}
-        <div className="overflow-y-auto max-h-[70vh]">
+        <div className=" bg-white/20 backdrop-blur-md border border-white/30 shadow-lg p-2 rounded-2xl  transition-all duration-300 h-[50vh] overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -169,15 +168,15 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
               هنوز هیچ دسته‌ای وجود ندارد.
             </p>
           ) : (
-            <ul className="space-y-1 max-h-[50vh]">
+            <ul className="space-y-1 max-h-[50vh] grid grid-cols-2 gap-5">
               {categories.map((cat) => (
                 <li
                   key={cat._id}
-                  className={`flex justify-between items-center  hover:bg-gray-700 p-2 rounded-md text-xs ${cat.parent !==null ? "bg-[#010c32]": "bg-[#0037ff]"}`}
+                  className={`flex justify-between items-center  hover:bg-gray-700 p-2 rounded-md text-xs border-2`}
                 >
                   <div className="flex flex-col">
                     <span className="font-medium">{cat.name}</span>
-                    <span className="text-gray-400 text-[10px]">
+                    <span className="text-black text-xs">
                       {/* مادر: {cat?.parent?.name !== null ? cat.parent.name : "-"} */}
                       مادر: {cat.parent ? cat.parent.name : "-"}
                     </span>

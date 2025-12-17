@@ -1,11 +1,11 @@
 // todo
 // formatprice برای همه
-// لودینگ عکس
+// اپدیت بدون رفرش
 // دیتای بالا
 "use client";
 import Image from "next/image";
 import { Product } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Skeleton from "react-loading-skeleton";
 
@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   DollarSign,
   Edit2,
+  MessageSquare,
   Package,
   Plus,
   Trash2,
@@ -20,14 +21,26 @@ import {
 import StatsCard from "../components/StatsCard";
 import AddProductDrawer from "../components/drawers/AddProductDrawer";
 import { formatPrice } from "@/helpers/Price";
+
+type DrawerState = {
+  type: "add" | "edit" | null;
+  product: Product | null;
+};
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [OpenAdd, setOpenAdd] = useState(false);
+
+  const [stats, setStats] = useState({
+    total: 0,
+    value: 0,
+    lowStock: 0,
+    comments: 0,
+    verifiedComments: 0,
+  });
+
   const fetchProducts = async (page: number) => {
     try {
       setLoading(true);
@@ -36,6 +49,7 @@ export default function ProductsPage() {
       const data = await res.json();
       setProducts(data.products);
       setTotalPages(data.totalPages);
+      setStats(data.stats);
     } catch (err) {
       console.error(err);
       toast.error("خطا در دریافت محصولات");
@@ -47,25 +61,6 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts(page);
   }, [page]);
-
-  // Derived Stats
-  const stats = useMemo(() => {
-    return {
-      total: products.length,
-      value: products.reduce(
-        (acc, p) => acc + Number(p.price) * Number(p.stock),
-        0
-      ),
-
-      lowStock: products.filter((p) => p.stock < 5).length,
-    };
-  }, [products]);
-
-  // Handlers
-  const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("آیا از حذف این محصول اطمینان دارید؟")) return;
@@ -94,8 +89,20 @@ export default function ProductsPage() {
     }
   };
 
-  const closeDrawer = () => setOpenAdd(false);
+  const [drawer, setDrawer] = useState<DrawerState>({
+    type: null,
+    product: null,
+  });
 
+  // باز کردن مدال افزودن
+  const openAddDrawer = () => setDrawer({ type: "add", product: null });
+
+  // باز کردن مدال ویرایش
+  const openEditDrawer = (product: Product) =>
+    setDrawer({ type: "edit", product });
+
+  // بستن هر مدال
+  const closeDrawer = () => setDrawer({ type: null, product: null });
   return (
     <div className="min-h-screen bg-gray-50 text-right">
       <main className="p-4 sm:p-6 lg:p-8">
@@ -108,7 +115,7 @@ export default function ProductsPage() {
             </p>
           </div>
           <button
-            onClick={() => setOpenAdd(true)}
+            onClick={openAddDrawer}
             className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-all shadow-sm hover:shadow-md"
           >
             <Plus className="h-5 w-5" />
@@ -138,12 +145,15 @@ export default function ProductsPage() {
             icon={AlertTriangle}
             color="amber"
           />
-          {/* <StatsCard
-            title="محصولات فعال"
-            value={new Intl.NumberFormat("fa-IR").format(stats.active)}
-            icon={CheckCircle2}
+          <StatsCard
+            title=" نظرات"
+            value={new Intl.NumberFormat("fa-IR").format(stats.comments)}
+            icon={MessageSquare}
             color="indigo"
-          /> */}
+            trend={new Intl.NumberFormat("fa-IR").format(
+              stats.verifiedComments
+            )}
+          />
         </div>
 
         {/* Table Card */}
@@ -244,7 +254,7 @@ export default function ProductsPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => handleEdit(product)}
+                              onClick={() => openEditDrawer(product)}
                               className="rounded-lg p-2 text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                               title="ویرایش"
                             >
@@ -290,24 +300,24 @@ export default function ProductsPage() {
         </div>
       </main>
 
-      {/* Edit/Create Modal */}
-      {isModalOpen && (
+      {drawer.type === "add" && (
         <AddProductDrawer
-          onClose={() => setIsModalOpen(false)}
-          onUpdated={(updatedProduct) => {
+          onClose={closeDrawer}
+          onSave={(newProduct) => setProducts((prev) => [...prev, newProduct])}
+        />
+      )}
+
+      {drawer.type === "edit" && drawer.product && (
+        <AddProductDrawer
+          onClose={closeDrawer}
+          product={drawer.product}
+          onSave={(updatedProduct) => {
             setProducts((prev) =>
               prev.map((p) =>
                 p._id === updatedProduct._id ? updatedProduct : p
               )
             );
           }}
-          product={selectedProduct}
-        />
-      )}
-      {OpenAdd && (
-        <AddProductDrawer
-          onClose={closeDrawer}
-          onSave={(newProduct) => setProducts((prev) => [...prev, newProduct])}
         />
       )}
     </div>

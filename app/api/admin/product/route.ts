@@ -1,7 +1,9 @@
 import dbConnect from "@/lib/mongodb";
 import Product from "@/model/Product";
-import { data } from "framer-motion/client";
+import "@/model/Category";
+import "@/model/Tag";
 import { NextResponse } from "next/server";
+import Comment from "@/model/Comment";
 
 export async function GET(req: Request) {
   await dbConnect();
@@ -27,11 +29,23 @@ export async function GET(req: Request) {
     .limit(limit)
     .sort({ createdAt: -1 });
 
+  const stats = {
+    total: total,
+    value: products.reduce(
+      (acc, p) => acc + Number(p.price || 0) * Number(p.stock || 0),
+      0
+    ),
+    lowStock: products.filter((p) => Number(p.stock) < 5).length,
+    comments: await Comment.countDocuments(),
+    verifiedComments: await Comment.countDocuments({ verified: false }),
+  };
+  
   return NextResponse.json({
     products,
     total,
     page,
     totalPages: Math.ceil(total / limit),
+    stats,
   });
 }
 

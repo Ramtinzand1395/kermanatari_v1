@@ -52,7 +52,7 @@ export const navItems: NavItem[] = [
     children: [
       {
         label: "ثبت سفارش",
-        href: "/dashboard/account-order",
+        href: "/dashboard/store-order",
         icon: PlusCircle,
       },
       {
