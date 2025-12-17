@@ -82,7 +82,7 @@ export default function StoreOrder() {
             title="کل سفارش ها"
             icon={Package}
             color="blue"
-            link="+12%"
+            link="store-order/all-orders"
           />
           <StoreOrderCart
             title="لیست بازی ها"

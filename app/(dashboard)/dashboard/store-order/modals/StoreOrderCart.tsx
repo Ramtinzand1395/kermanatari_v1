@@ -1,6 +1,7 @@
 "use client";
 
 import { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 type ColorType = "indigo" | "green" | "amber" | "blue";
 
@@ -13,7 +14,6 @@ const colorClasses: Record<ColorType, string> = {
 
 interface StoreOrderCartProps {
   title: string;
-  // value: string | number;
   icon: LucideIcon;
   link?: string;
   color: ColorType;
@@ -31,11 +31,9 @@ const StoreOrderCart = ({
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-gray-500">{title}</p>
-          {/* <h3 className="mt-2 text-xs text-gray-900">{value}</h3> */}
-
-          <button className="text-blue-600 text-xs cursor-pointer">
+          <Link href={link!} className="text-blue-600 text-xs cursor-pointer">
             مشاهده همه
-          </button>
+          </Link>
         </div>
         <div className={`rounded-lg p-3 ${colorClasses[color]}`}>
           <Icon className="h-6 w-6" />
