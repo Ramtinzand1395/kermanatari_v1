@@ -6,12 +6,14 @@ interface Params {
   orderId: string;
 }
 
-export async function PUT(req: Request, context: { params: Params }) {
+export async function PUT(
+  req: Request,
+  context: { params: Promise<Params> } // ⚠ حتما Promise
+): Promise<NextResponse> {
   await dbConnect();
 
   try {
-    const { params } = context;
-  const { orderId } = await params;
+    const { orderId } = await context.params;
     const body = await req.json();
     const { list, price, consoleType, description } = body;
     const order = await StoreOrder.findById(orderId);
@@ -37,12 +39,14 @@ export async function PUT(req: Request, context: { params: Params }) {
 }
 
 /* ===================== DELETE ===================== */
-export async function DELETE(req: Request, context: { params: Params }) {
+export async function DELETE(
+  req: Request,
+  context: { params: Promise<Params> } // ⚠ حتما Promise
+): Promise<NextResponse> {
   await dbConnect();
 
   try {
-  const { params } = context;
-  const { orderId } = await params;
+    const { orderId } = await context.params;
 
     const order = await StoreOrder.findByIdAndDelete(orderId);
 
