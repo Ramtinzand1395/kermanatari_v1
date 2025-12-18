@@ -1,6 +1,8 @@
 import "@/app/globals.css";
 import "react-loading-skeleton/dist/skeleton.css";
-
+// todo
+// پاک بشه
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import localFont from "next/font/local";
 import Script from "next/script";
 import { ToastContainer } from "react-toastify";
@@ -72,6 +74,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           <main id="content">{children}</main>
+          <SpeedInsights />
           <Footer />
         </AuthProvider>
 
