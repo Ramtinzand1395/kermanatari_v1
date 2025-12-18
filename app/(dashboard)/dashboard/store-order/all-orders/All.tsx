@@ -8,7 +8,7 @@ import { toPersianDate } from "@/helpers/toPersianDate";
 import { useSearchParams } from "next/navigation";
 import FilterOrders from "../modals/FilterOrders";
 
-const AllStoreOrders = () => {
+export default function AllStoreOrders() {
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<storeOrder[]>([]);
   const [page, setPage] = useState(1);
@@ -40,7 +40,6 @@ const AllStoreOrders = () => {
   }, [searchParams, page]);
 
   return (
-    <Suspense fallback={<div>در حال بارگذاری...</div>}>
       <div className="w-full md:container md:mx-auto mx-2 my-10">
         <FilterOrders />
 
@@ -124,8 +123,5 @@ const AllStoreOrders = () => {
           </div>
         </div>
       </div>
-    </Suspense>
   );
-};
-
-export default AllStoreOrders;
+}
