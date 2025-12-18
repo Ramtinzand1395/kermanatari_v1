@@ -1,10 +1,5 @@
 "use client";
-// todo
-// اضافه کردن فرم ولیدیشن
-// اضافه کردن ارتفاع
-// جدا کردن پرنت ها
-// دلیت
-// مدیریت خطا ها
+
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import { X, Loader2 } from "lucide-react";
@@ -62,7 +57,7 @@ export default function AddCategoryDrawer({ onClose }: AddCategoryDrawerProps) {
         setParentId(null);
         fetchCategories();
       } else {
-        toast.error(data.error || "خطا در افزودن دسته");
+        toast.error(`${data.error} نام اسلاگ تکراری است.`);
       }
     } catch (err) {
       console.error(err);

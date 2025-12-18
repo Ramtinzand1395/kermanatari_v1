@@ -15,12 +15,11 @@ type OrdersByConsole = {
   xbox: storeOrder[];
   copy: storeOrder[];
 };
-// todo
-// loding skeleton
-// realtime
-// مدال آپدیت ps4مشکل داره
+
 export default function StoreOrder() {
   const [OpenAddItem, setOpenAddItem] = useState(false);
+  const [Loading, setLoading] = useState(false);
+  const [loadingSms, setloadingSms] = useState(false);
 
   const handleOpenModal = () => {
     setOpenAddItem(!OpenAddItem);
@@ -36,6 +35,7 @@ export default function StoreOrder() {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      setLoading(true);
       try {
         const res = await fetch(`/api/admin/store-order`);
 
@@ -50,6 +50,8 @@ export default function StoreOrder() {
       } catch (err) {
         console.error(err);
         toast.error("خطای سرور");
+      } finally {
+        setLoading(false);
       }
     };
     fetchOrders();
@@ -98,6 +100,9 @@ export default function StoreOrder() {
             link="+5%"
           />
         </div>
+        {loadingSms && (
+          <p className="text-green-500 animate-bounce">در حال ارسال پیام</p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2  gap-5 md:gap-2">
           <div className="bg-white shadow-md rounded-lg p-5">
             <OrderTable
@@ -105,6 +110,8 @@ export default function StoreOrder() {
               Orders={orders.ps5}
               setOrders={setOrders}
               consoleKey="ps5"
+              isLoading={Loading}
+              setloadingSms={setloadingSms}
             />
           </div>
           <div className="bg-white shadow-md rounded-lg p-5">
@@ -113,6 +120,8 @@ export default function StoreOrder() {
               Orders={orders.ps4}
               setOrders={setOrders}
               consoleKey="ps4"
+              isLoading={Loading}
+              setloadingSms={setloadingSms}
             />
           </div>
           <div className="bg-white shadow-md rounded-lg p-5">
@@ -121,6 +130,8 @@ export default function StoreOrder() {
               Orders={orders.copy}
               setOrders={setOrders}
               consoleKey="xbox"
+              isLoading={Loading}
+              setloadingSms={setloadingSms}
             />
           </div>
           <div className="bg-white shadow-md rounded-lg p-5">
@@ -129,6 +140,8 @@ export default function StoreOrder() {
               Orders={orders.xbox}
               setOrders={setOrders}
               consoleKey="copy"
+              isLoading={Loading}
+              setloadingSms={setloadingSms}
             />
           </div>
         </div>
