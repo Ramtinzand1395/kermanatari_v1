@@ -1,14 +1,11 @@
-"use client"
-
-import { useEffect } from "react";
+import Hero from "./components/Hero";
 
 const Home = () => {
-
   return (
     <div>
-      ff
+      <Hero />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
