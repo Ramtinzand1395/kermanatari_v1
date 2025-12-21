@@ -95,8 +95,18 @@ export interface storeOrder {
   deliveryCode: string;
   deliveryDate: string;
 }
+// !لیست بازی ها
+export interface GameItem {
+  _id: string;
+  name: string;
+  platform?: string;
+}
 
-
+export interface GameList {
+  _id: string;
+  platform: "ps5" | "ps4" | "کپی خور" | "xbox";
+  items: GameItem[];
+}
 // !پاک بشه
 export interface Favorite {
   id: number;

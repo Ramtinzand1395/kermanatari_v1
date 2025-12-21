@@ -91,7 +91,7 @@ export default function StoreOrder() {
             title="لیست بازی ها"
             icon={DollarSign}
             color="green"
-            link="+5%"
+            link="store-order/all-gamelist"
           />
           <StoreOrderCart
             title="اطلاعات مشتری"
