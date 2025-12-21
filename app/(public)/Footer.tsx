@@ -13,7 +13,7 @@ const menuItems = [
 export default function Footer() {
   return (
     <footer
-      className="bg-white text-gray-700 mt-10"
+      className="bg-white text-gray-700 mt-10 border-t rounded-2xl"
       role="contentinfo"
       aria-label="پاورقی سایت"
     >
