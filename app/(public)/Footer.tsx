@@ -176,7 +176,7 @@ export default function Footer() {
           </ul>
         </nav>
 
-        <p className="text-gray-400 text-xs md:text-sm text-center ">
+<p className="text-gray-700 text-xs md:text-sm text-center">
           © 2025 KermanAtari. کلیه حقوق محفوظ است.
         </p>
       </div>
