@@ -4,7 +4,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthProvider from "@/app/AuthProvider";
 import DashboardSidebar from "./components/DashboardSidebar";
-import "react-loading-skeleton/dist/skeleton.css";
+// todo
+// متن زیر ورود اشتباه
+// سرعنش پایینه و لودینگ داره که حذف بشه ورود
+// جدید حذف شده
+// import "react-loading-skeleton/dist/skeleton.css";
 
 const vazir = localFont({
   src: "./Vazir.woff2",

@@ -13,6 +13,9 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    // todo
+    // جدیده
+    "forceConsistentCasingInFileNames": true,
     "plugins": [
       {
         "name": "next"
