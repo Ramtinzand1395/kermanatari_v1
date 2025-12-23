@@ -6,6 +6,8 @@
 // import { getServerSession } from "next-auth";
 // import { authOptions } from "../../auth/[...nextauth]/options";
 
+import { NextResponse } from "next/server";
+
 // export async function GET() {
 //   try {
 //     const session = await getServerSession(authOptions);
@@ -32,3 +34,18 @@
 //     return NextResponse.json({ error: error.message }, { status: 500 });
 //   }
 // }
+// !پاکبشه
+export async function GET() {
+  try {
+   
+    console.log("first")
+
+    return NextResponse.json("ok");
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "خطا در دریافت آدرس‌ها" },
+      { status: 500 }
+    );
+  }
+}

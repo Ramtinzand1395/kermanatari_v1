@@ -21,7 +21,7 @@ export default function FavoritesPage() {
   const getFavorites = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/users_data/favorites", { method: "GET" });
+      const res = await fetch("/api/profile/favorites", { method: "GET" });
       if (!res.ok) {
         const err = await res.json();
         toast.error(err?.error || "خطا در دریافت علاقه‌مندی‌ها");
@@ -41,7 +41,7 @@ export default function FavoritesPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/users_data/favorites", {
+      const res = await fetch("/api/profile/favorites", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId }),

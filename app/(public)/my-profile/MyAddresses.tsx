@@ -18,7 +18,7 @@ export default function MyAddresses() {
   const getAddresses = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/users_data/address");
+      const res = await fetch("/api/profile/address");
       const data = await res.json();
       setAddresses(data);
     } catch (err) {
@@ -43,7 +43,7 @@ export default function MyAddresses() {
     }
     try {
       const method = form._id ? "PUT" : "POST";
-      const res = await fetch("/api/users_data/address", {
+      const res = await fetch("/api/profile/address", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -60,7 +60,7 @@ export default function MyAddresses() {
   const handleDelete = async (id: number) => {
     if (!confirm("آیا مطمئن هستید می‌خواهید این آدرس را حذف کنید؟")) return;
     try {
-      const res = await fetch(`/api/users_data/address?id=${id}`, {
+      const res = await fetch(`/api/profile/address?id=${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();

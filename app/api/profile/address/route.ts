@@ -35,8 +35,6 @@ export async function GET() {
 
 // ===== POST Add Address =====
 export async function POST(req: NextRequest) {
-    console.log("post")
-
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -74,7 +72,6 @@ export async function POST(req: NextRequest) {
 
 // ===== PUT Update Address =====
 export async function PUT(req: NextRequest) {
-    console.log("first")
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
