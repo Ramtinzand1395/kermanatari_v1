@@ -18,7 +18,7 @@ export default async function MyProfile({ searchParams }: MyProfilePageProps) {
     <div className="md:container mx-auto sm:mx-2 my-5">
       <div className="flex gap-5">
         <Sidebar />
-        <div className="flex flex-col w-full md:w-[70vw]">
+        <div className="flex flex-col w-full ">
           <Stepper activeStep={activeStep} />
 
           {activeStep === 1 && <Profile />}

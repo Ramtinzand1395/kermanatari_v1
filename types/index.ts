@@ -242,7 +242,7 @@ export interface Comment {
 }
 
 export interface Address {
-  id: number;
+  _id: number;
   userId: number;
   address: string;
   city: string;

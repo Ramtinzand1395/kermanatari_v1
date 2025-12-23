@@ -1,93 +1,143 @@
-// import { NextRequest, NextResponse } from "next/server";
-// import { prisma } from "@/lib/prisma";
-// import { getServerSession } from "next-auth";
-// import { authOptions } from "../../auth/[...nextauth]/options";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/options";
+import dbConnect from "@/lib/mongodb";
+import Address from "@/model/Address";
 
-// // ===== GET Addresses =====
-// export async function GET(req: NextRequest) {
-//   try {
-//     const session = await getServerSession(authOptions);
-//     if (!session?.user?.id) {
-//       return NextResponse.json({ error: "کاربر وارد نشده" }, { status: 401 });
-//     }
 
-//     const addresses = await prisma.address.findMany({
-//       where: { userId: Number(session.user.id) },
-//       orderBy: { createdAt: "desc" },
-//     });
+// ===== GET Addresses =====
+export async function GET() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "کاربر وارد نشده" },
+        { status: 401 }
+      );
+    }
 
-//     return NextResponse.json(addresses);
-//   } catch (err) {
-//     return NextResponse.json({ error: "خطا در دریافت آدرس‌ها" }, { status: 500 });
-//   }
-// }
+    await dbConnect();
 
-// // ===== POST Add Address =====
-// export async function POST(req: NextRequest) {
-//   try {
-//     const session = await getServerSession(authOptions);
-//     if (!session?.user?.id) {
-//       return NextResponse.json({ error: "کاربر وارد نشده" }, { status: 401 });
-//     }
+    const addresses = await Address.find({
+      userId: session.user.id,
+    }).sort({ createdAt: -1 });
 
-//     const { province, city, address, plaque, unit, postalCode } = await req.json();
+    return NextResponse.json(addresses);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "خطا در دریافت آدرس‌ها" },
+      { status: 500 }
+    );
+  }
+}
 
-//     const newAddress = await prisma.address.create({
-//       data: {
-//         userId: Number(session.user.id),
-//         province,
-//         city,
-//         address,
-//         plaque,
-//         unit,
-//         postalCode,
-//       },
-//     });
 
-//     return NextResponse.json(newAddress, { status: 201 });
-//   } catch (err) {
-//     console.error(err);
-//     return NextResponse.json({ error: "خطا در افزودن آدرس" }, { status: 500 });
-//   }
-// }
+// ===== POST Add Address =====
+export async function POST(req: NextRequest) {
+    console.log("post")
 
-// // ===== PUT Update Address =====
-// export async function PUT(req: NextRequest) {
-//   try {
-//     const session = await getServerSession(authOptions);
-//     if (!session?.user?.id) {
-//       return NextResponse.json({ error: "کاربر وارد نشده" }, { status: 401 });
-//     }
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "کاربر وارد نشده" },
+        { status: 401 }
+      );
+    }
 
-//     const { id, province, city, address, plaque, unit, postalCode } = await req.json();
+    await dbConnect();
 
-//     const updated = await prisma.address.update({
-//       where: { id },
-//       data: { province, city, address, plaque, unit, postalCode },
-//     });
+    const { province, city, address, plaque, unit, postalCode } =
+      await req.json();
 
-//     return NextResponse.json(updated);
-//   } catch (err) {
-//     console.error(err);
-//     return NextResponse.json({ error: "خطا در بروزرسانی آدرس" }, { status: 500 });
-//   }
-// }
+    const newAddress = await Address.create({
+      userId: session.user.id,
+      province,
+      city,
+      address,
+      plaque,
+      unit,
+      postalCode,
+    });
 
-// // ===== DELETE Address =====
-// export async function DELETE(req: NextRequest) {
-//   try {
-//     const session = await getServerSession(authOptions);
-//     if (!session?.user?.id) {
-//       return NextResponse.json({ error: "کاربر وارد نشده" }, { status: 401 });
-//     }
+    return NextResponse.json(newAddress, { status: 201 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "خطا در افزودن آدرس" },
+      { status: 500 }
+    );
+  }
+}
 
-//     const id = Number(req.nextUrl.searchParams.get("id"));
-//     if (!id) return NextResponse.json({ error: "id الزامی است" }, { status: 400 });
 
-//     await prisma.address.delete({ where: { id } });
-//     return NextResponse.json({ message: "آدرس حذف شد" });
-//   } catch (err) {
-//     console.error(err);
-//     return NextResponse.json({ error: "خطا در حذف آدرس" }, { status: 500 });
-//   }
-// }
+// ===== PUT Update Address =====
+export async function PUT(req: NextRequest) {
+    console.log("first")
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "کاربر وارد نشده" },
+        { status: 401 }
+      );
+    }
+
+    await dbConnect();
+
+    const { id, province, city, address, plaque, unit, postalCode } =
+      await req.json();
+
+    const updated = await Address.findOneAndUpdate(
+      { _id: id, userId: session.user.id },
+      { province, city, address, plaque, unit, postalCode },
+      { new: true }
+    );
+
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "خطا در بروزرسانی آدرس" },
+      { status: 500 }
+    );
+  }
+}
+
+
+// ===== DELETE Address =====
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "کاربر وارد نشده" },
+        { status: 401 }
+      );
+    }
+
+    await dbConnect();
+
+    const id = req.nextUrl.searchParams.get("id");
+    if (!id) {
+      return NextResponse.json(
+        { error: "id الزامی است" },
+        { status: 400 }
+      );
+    }
+
+    await Address.deleteOne({
+      _id: id,
+      userId: session.user.id,
+    });
+
+    return NextResponse.json({ message: "آدرس حذف شد" });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "خطا در حذف آدرس" },
+      { status: 500 }
+    );
+  }
+}

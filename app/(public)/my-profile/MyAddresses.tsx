@@ -1,25 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
 import { Iran } from "provinces-and-cities";
-
-interface Address {
-  id: number;
-  province: string;
-  city: string;
-  address: string;
-  plaque?: string;
-  unit?: string;
-  postalCode: string;
-}
+import { addressSchema } from "@/validations/UserInfoValidation";
+import * as yup from "yup";
+import { Address } from "@/types";
 
 export default function MyAddresses() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<Partial<Address>>({});
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const getAddresses = async () => {
     setLoading(true);
@@ -38,7 +32,17 @@ export default function MyAddresses() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const method = form.id ? "PUT" : "POST";
+      await addressSchema.validate(form, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        err.inner.forEach((e) => toast.error(e.message));
+      } else {
+        toast.error("خطای ناشناخته");
+      }
+      return;
+    }
+    try {
+      const method = form._id ? "PUT" : "POST";
       const res = await fetch("/api/users_data/address", {
         method,
         headers: { "Content-Type": "application/json" },
@@ -60,7 +64,7 @@ export default function MyAddresses() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();
-      setAddresses((prev) => prev.filter((a) => a.id !== id));
+      setAddresses((prev) => prev.filter((a) => a._id !== id));
       toast.info("آدرس حذف شد");
     } catch {
       toast.error("خطا در حذف آدرس");
@@ -74,15 +78,15 @@ export default function MyAddresses() {
   useEffect(() => {
     getAddresses();
   }, []);
-
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6  mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-gray-800">آدرس‌های من</h1>
 
       {/* فرم اضافه/ویرایش */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-gray-200"
+        ref={formRef}
+        className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-gray-200 w-full"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-5">
           <div className="flex flex-col">
@@ -200,7 +204,7 @@ export default function MyAddresses() {
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition"
           >
-            {form.id ? "ویرایش آدرس" : "افزودن آدرس"}
+            {form._id ? "ویرایش آدرس" : "افزودن آدرس"}
           </button>
         </div>
       </form>
@@ -223,7 +227,7 @@ export default function MyAddresses() {
         ) : addresses.length > 0 ? (
           addresses.map((a) => (
             <div
-              key={a.id}
+              key={a._id}
               className="bg-white border border-gray-200 rounded-xl p-6 shadow-md hover:shadow-xl transition relative"
             >
               <p className="text-sm font-semibold text-gray-700 mb-2">
@@ -240,13 +244,20 @@ export default function MyAddresses() {
               <div className="flex gap-3 justify-end">
                 <button
                   className="text-blue-600 text-sm font-medium hover:underline"
-                  onClick={() => setForm(a)}
+                  onClick={() => {
+                    setForm(a);
+
+                    formRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }}
                 >
                   ویرایش
                 </button>
                 <button
                   className="text-red-600 text-sm font-medium hover:underline"
-                  onClick={() => handleDelete(a.id)}
+                  onClick={() => handleDelete(a._id)}
                 >
                   حذف
                 </button>
