@@ -1,7 +1,7 @@
 "use client";
 
 import { ProductForm, Tag } from "@/types";
- 
+
 interface TagsSelectorProps {
   form: ProductForm;
   tagsList: Tag[];
@@ -16,29 +16,30 @@ const TagsSelector = ({ updateField, form, tagsList }: TagsSelectorProps) => {
       <div>
         <p className="font-medium mb-2">تگ‌ها</p>
         <div className="flex flex-wrap gap-2">
-          {tagsList.map((tag) => (
-            <button
-              key={tag._id}
-              type="button"
-              onClick={() => {
-                if (!form.tags.includes(tag._id)) {
-                  updateField("tags", [...form.tags, tag._id]);
-                } else {
-                  updateField(
-                    "tags",
-                    form.tags.filter((id) => id !== tag._id)
-                  );
-                }
-              }}
-              className={`px-2 py-1 rounded text-xs ${
-                form.tags.includes(tag._id)
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}
-            >
-              {tag.name}
-            </button>
-          ))}
+          {tagsList &&
+            tagsList?.map((tag) => (
+              <button
+                key={tag._id}
+                type="button"
+                onClick={() => {
+                  if (!form.tags.includes(tag._id)) {
+                    updateField("tags", [...form.tags, tag._id]);
+                  } else {
+                    updateField(
+                      "tags",
+                      form.tags.filter((id) => id !== tag._id)
+                    );
+                  }
+                }}
+                className={`px-2 py-1 rounded text-xs ${
+                  form.tags.includes(tag._id)
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}
+              >
+                {tag.name}
+              </button>
+            ))}
         </div>
       </div>
     </div>
