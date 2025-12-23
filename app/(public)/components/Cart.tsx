@@ -35,9 +35,10 @@ export default function Cart({ game }: CartProps) {
   const discountPercentage = game.discountPrice
     ? Math.round(((game.price - game.discountPrice) / game.price) * 100)
     : 0;
-
   // داخل همان فایل Cart کامپوننت — فقط توابع زیر را جایگزین کنید
-
+// todo
+// قلب قرمز بشه و حذف بشه از لیست
+// بهم ریخته میشه در علاقه مندی ها
   const handleToggleFavorite = async () => {
     if (!session?.user?.id) {
       toast.error("برای افزودن به علاقه‌مندی ابتدا وارد شوید.");
@@ -47,7 +48,7 @@ export default function Cart({ game }: CartProps) {
     const productId = game._id;
 
     try {
-      const res = await fetch("/api/favorites", {
+      const res = await fetch("/api/users_data/favorites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId }),
@@ -70,7 +71,8 @@ export default function Cart({ game }: CartProps) {
       toast.error("خطایی رخ داد");
     }
   };
-
+// todo
+// یکجا باشه
   const rating = game.comments?.length
     ? game.comments.reduce((t: number, c: Comment) => t + c.rating, 0) /
       game.comments.length

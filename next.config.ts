@@ -1,14 +1,13 @@
 // todo
-// 
+//
 // اضافه شده
 //       optimizeCss: true,
 
 const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
-    experimental: {
-      optimizeCss: true,
-    },
+
+    optimizeCss: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",

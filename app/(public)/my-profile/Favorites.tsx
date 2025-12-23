@@ -1,17 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Favorite, Product } from "@/types";
-// import Skeleton from "react-loading-skeleton";
-// import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
-import Image from "next/image";
+import Cart from "../components/Cart";
+import { Product } from "@/types";
+import SkeletonLoading from "../components/SkeletonLoading";
+
+interface Favorite {
+  _id: string; // favoriteId
+  userId: string;
+  productId: Product;
+  createdAt: string;
+}
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
+
+  const [loading, setLoading] = useState(false);
 
   const getFavorites = async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/users_data/favorites", { method: "GET" });
       if (!res.ok) {
@@ -20,8 +28,7 @@ export default function FavoritesPage() {
         return;
       }
       const data = await res.json();
-      const products = data.map((fav: Favorite) => fav.product);
-      setFavorites(products);
+      setFavorites(data);
     } catch (err) {
       console.error(err);
       toast.error("خطا در دریافت علاقه‌مندی‌ها");
@@ -31,6 +38,8 @@ export default function FavoritesPage() {
   };
 
   const removeFavorite = async (productId: string) => {
+    setLoading(true);
+
     try {
       const res = await fetch("/api/users_data/favorites", {
         method: "DELETE",
@@ -44,20 +53,24 @@ export default function FavoritesPage() {
         return;
       }
 
-      setFavorites((prev) => prev.filter((p) => p._id !== productId));
+      setFavorites((prev) => prev.filter((p) => p.productId._id !== productId));
+
       toast.info("محصول از علاقه‌مندی‌ها حذف شد");
     } catch (err) {
       console.error(err);
       toast.error("خطا در حذف محصول");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     getFavorites();
   }, []);
-
   return (
-    <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {loading &&
+        Array.from({ length: 8 }).map((_, i) => <SkeletonLoading key={i} />)}
       {favorites.length === 0 ? (
         <div className="col-span-full text-center p-8 text-gray-500">
           هیچ محصولی در علاقه‌مندی‌ها وجود ندارد.
@@ -68,22 +81,10 @@ export default function FavoritesPage() {
             key={product._id}
             className="border rounded-lg p-2 hover:shadow-lg transition relative bg-white flex flex-col"
           >
-            <Image
-              width={50}
-              height={50}
-              src={product.mainImage}
-              alt={product.title}
-              className="w-full h-32 sm:h-40 object-contain mb-2"
-            />
-            <h3 className="text-xs sm:text-sm font-semibold line-clamp-2">
-              {product.title}
-            </h3>
-            <p className="text-gray-700 text-xs sm:text-sm mt-1">
-              {product.price.toLocaleString()} تومان
-            </p>
+            <Cart game={product.productId} />
             <button
-              onClick={() => removeFavorite(product._id)}
-              className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
+              onClick={() => removeFavorite(product.productId._id)}
+              className=" bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition"
             >
               حذف
             </button>

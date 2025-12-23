@@ -199,7 +199,7 @@ export default function ProductsPage() {
                         className="group hover:bg-gray-50/50 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
+                          <div className="flex flex-col items-center gap-3">
                             <Image
                               src={product.mainImage}
                               alt={product.title}
@@ -207,7 +207,7 @@ export default function ProductsPage() {
                               height={50}
                               className="h-10 w-10 rounded-lg object-cover ring-1 ring-gray-100"
                             />
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-gray-900 whitespace-nowrap">
                               {product.title}
                             </span>
                           </div>

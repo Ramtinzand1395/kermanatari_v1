@@ -37,7 +37,6 @@ export default function AddProductDrawer({ onClose, onSave, product }: Props) {
     tags: product?.tags?.map((t: Tag) => t._id) || [],
     specifications: product?.specifications || [],
   });
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
