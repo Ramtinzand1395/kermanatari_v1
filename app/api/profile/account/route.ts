@@ -19,7 +19,6 @@ function faToEnNumbers(str: string): string {
 export async function GET() {
   try {
     await dbConnect();
-
     const session = await getServerSession(authOptions);
     if (!session?.user?.mobile) {
       return NextResponse.json({ error: "کاربر وارد نشده" }, { status: 401 });
@@ -81,7 +80,7 @@ export async function PUT(req: NextRequest) {
         gender: data.gender,
         birthday: birthdayGregorian,
         nationalCode: data.nationalCode,
-        newsletter:data.newsletter
+        newsletter: data.newsletter,
       },
       { new: true } // بازگرداندن نسخه بروز شده
     );
