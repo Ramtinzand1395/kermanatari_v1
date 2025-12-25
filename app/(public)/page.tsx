@@ -24,6 +24,8 @@ export default async function Home() {
       fetcher("/api/products?category=accessories"),
     ]);
     console.log(games,"game")
+  console.log(process.env.MONGODB_URI);
+
   return (
     <div>
       <Hero />
