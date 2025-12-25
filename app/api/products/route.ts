@@ -132,8 +132,8 @@ import "@/model/Comment";
 
 export async function GET(req: Request) {
   try {
-    await dbConnect();
-
+    const data = await dbConnect();
+    console.log(data, "dbconnect");
     const { searchParams } = new URL(req.url);
     const categorySlug = searchParams.get("category");
     const hasDiscount = searchParams.get("discount");
@@ -152,18 +152,22 @@ export async function GET(req: Request) {
 
     /* ================== CATEGORY FILTER ================== */
     if (categorySlug) {
-      const mainCategory = await Category.findOne({ slug: categorySlug }).select("_id");
+      const mainCategory = await Category.findOne({
+        slug: categorySlug,
+      }).select("_id");
 
       // اگر دسته وجود نداشت → هیچی برنگرد
       if (!mainCategory) {
         return NextResponse.json([]);
       }
 
-      const subCategories = await Category.find({ parent: mainCategory._id }).select("_id");
+      const subCategories = await Category.find({
+        parent: mainCategory._id,
+      }).select("_id");
 
       const categoryIds = [
         mainCategory._id,
-        ...subCategories.map(c => c._id),
+        ...subCategories.map((c) => c._id),
       ];
 
       filter.category = { $in: categoryIds };
@@ -182,6 +186,9 @@ export async function GET(req: Request) {
     return NextResponse.json(products);
   } catch (err) {
     console.error("❌ Products API Error:", err);
-    return NextResponse.json({ error: "خطا در دریافت محصولات" }, { status: 500 });
+    return NextResponse.json(
+      { error: "خطا در دریافت محصولات" },
+      { status: 500 }
+    );
   }
 }
