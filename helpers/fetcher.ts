@@ -1,7 +1,6 @@
-
 export async function fetcher(path: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  console.log(process.env.MONGODB_URI);
   try {
     const res = await fetch(`${baseUrl}${path}`);
 
