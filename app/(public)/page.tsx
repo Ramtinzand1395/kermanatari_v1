@@ -22,7 +22,6 @@ export default async function Home() {
       fetcher("/api/products?category=gaming-accessories"),
       fetcher("/api/products?category=accessories"),
     ]);
-
   return (
     <div>
       <Hero />

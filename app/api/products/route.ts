@@ -122,6 +122,8 @@
 //     );
 //   }
 // }
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
@@ -132,8 +134,8 @@ import "@/model/Comment";
 
 export async function GET(req: Request) {
   try {
-    const data = await dbConnect();
-    console.log(data, "dbconnect");
+    await dbConnect();
+
     const { searchParams } = new URL(req.url);
     const categorySlug = searchParams.get("category");
     const hasDiscount = searchParams.get("discount");
